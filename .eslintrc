@@ -21,7 +21,10 @@
     "no-return-assign": 0,
     "camelcase": 0,
     "import/extensions": 0,
-    "@typescript-eslint/no-redeclare": 0
+    "@typescript-eslint/no-redeclare": 0,
+    "@typescript-eslint/indent": "off",
+    "@typescript-eslint/quotes": "off",
+    "@typescript-eslint/comma-dangle": "off"
   },
   "settings": {
     "import/parsers": {

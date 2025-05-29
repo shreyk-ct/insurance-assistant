@@ -1,16 +1,11 @@
 import express from 'express';
 
-import MessageResponse from '../interfaces/MessageResponse';
-import emojis from './emojis';
+import { handleWebhook, verifyWebhook } from '../whatsapp/receiveMessage';
 
 const router = express.Router();
 
-router.get<{}, MessageResponse>('/', (req, res) => {
-  res.json({
-    message: 'API - 👋🌎🌍🌏',
-  });
-});
+router.get('/webhook/whatsapp', verifyWebhook);
 
-router.use('/emojis', emojis);
+router.post('/webhook/whatsapp', handleWebhook);
 
 export default router;
