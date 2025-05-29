@@ -30,6 +30,19 @@ export const getClaimPolicyInfo = async (phoneNumber: string) => {
     }
 };
 
+export const getPolicyDocument = async (policyId: string) => {
+    const policyQuery = `
+        SELECT policy_document FROM policies WHERE id = $1;
+    `;
+    try {
+        const { rows } = await connectionPool.query(policyQuery, [policyId]);
+        return rows[0].policy_document;
+    } catch (error) {
+        console.error('Error getting policy document:', error);
+        return Promise.reject(error);
+    }
+}
+
 export const uploadPolicyDocument = async () => {
     const policyQuery = `
         update policies set policy_document = $1
@@ -44,7 +57,7 @@ export const uploadPolicyDocument = async () => {
         console.log('File content (callback):');
         const values = [data];
         try {
-            const { rows } = await connectionPool.query(policyQuery, values);
+            await connectionPool.query(policyQuery, values);
             return;
         } catch (error) {
             console.error('Error getting user info:', error);

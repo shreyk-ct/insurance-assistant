@@ -3,9 +3,10 @@ import { summarizeDamages } from "../utils";
 import { downloadImage } from "./downloadImage";
 import { templateMessage } from "./templateMessage";
 import { getOpenAIThread, updateOpenAIThreadPolicy } from "../db/threads";
-import { createThread, createThreadMessageWithImage, pollThreadResponse, runThread } from "../openai";
+import { createThread, createThreadMessageWithFile, createThreadMessageWithImage, pollThreadResponse, runThread } from "../openai";
 import { OpenAIThreadMessageResponse } from "../openai/types";
 import { addImage, updateClaimIdInClaimImages } from "../db/claimImages";
+import { getPolicyDocument } from "../db/policy";
 
 export const handleWhatsappMessages = async (
     senderPhoneNumber: string,
@@ -61,6 +62,11 @@ export const handleWhatsappMessages = async (
             const listReply = interactiveMessage.list_reply;
             await templateMessage(`Thank you! We will be keeping Policy Number ${listReply.title} in our mind while proceeding. Please let us know your query!`, senderPhoneNumber, true, messageId, false);
             await updateOpenAIThreadPolicy(senderPhoneNumber, listReply.id);
+            // TODO: add file to thread
+            const activeThread: string | undefined = await getOpenAIThread(senderPhoneNumber);
+            const policyDocument = await getPolicyDocument(listReply.id);
+            const file = new File([policyDocument], `policy_document.${listReply.id}.pdf`, { type: 'application/pdf' });
+            await createThreadMessageWithFile(activeThread!, "analyze", file);
             await updateClaimIdInClaimImages(listReply.id);
         }
     }

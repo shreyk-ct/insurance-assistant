@@ -24,7 +24,9 @@
     "@typescript-eslint/no-redeclare": 0,
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/quotes": "off",
-    "@typescript-eslint/comma-dangle": "off"
+    "@typescript-eslint/comma-dangle": "off",
+    "@typescript-eslint/no-loop-func": "off",
+    "@typescript-eslint/semi": "off"
   },
   "settings": {
     "import/parsers": {

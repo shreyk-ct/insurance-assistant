@@ -1,2 +1,7 @@
-export type OpenAIThreadMessageResponse =
-    { type: 'text', text: { value: string, annotation: [] } }
+export type OpenAIThreadMessageResponse = {
+    type: 'text',
+    text: {
+        value: string,
+        annotation: []
+    }
+}

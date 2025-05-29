@@ -1,6 +1,6 @@
 import axios from "axios";
-import { config } from 'dotenv';
-config();
+import { config as dotenvConfig } from 'dotenv';
+dotenvConfig();
 
 const facebookGraphApi = axios.create({
     baseURL: `https://graph.facebook.com/v${process.env.WHATSAPP_API_VERSION}/`,

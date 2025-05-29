@@ -1,11 +1,5 @@
 import { Request, Response } from 'express';
 import { handleWhatsappMessages } from '.';
-// import { groqChatCompletionWithImage } from '../llm/groqAI';
-// import { summarizeDamages } from '../utils';
-// import { setPolicyCache } from '../cache';
-// import { closeConversation, updateConversationPolicy } from '../db/conversation';
-// import { sendMail } from '../email';
-// import { addImage, updateClaimIdInClaimImages } from '../db/claimImages';
 
 export const verifyWebhook = (req: Request, res: Response) => {
     const hubChallenge = req.query['hub.challenge'];
