@@ -1,4 +1,5 @@
 import connectionPool from ".";
+import sql from "./db";
 
 export const createOpenAIThread = async (phoneNumber: string, threadId: string) => {
     const openAIThreadQuery = `
@@ -44,14 +45,14 @@ export const updateOpenAIThreadPolicy = async (phoneNumber: string, policyId: st
 };
 
 export const getOpenAIThread = async (phoneNumber: string): Promise<string | undefined> => {
-    const openAIThreadQuery = `
-        SELECT thread_id FROM openai_threads WHERE user_id = (select id from users where phone_number = $1) and active = true;
-    `;
-    const values = [phoneNumber];
+    // const openAIThreadQuery = `
+    //     SELECT thread_id FROM openai_threads WHERE user_id = (select id from users where phone_number = $1) and active = true;
+    // `;
+    // const values = [phoneNumber];
     try {
-        const { rows } = await connectionPool.query(openAIThreadQuery, values);
-        if (rows[0])
-            return rows[0].thread_id;
+        const thread = await sql`SELECT thread_id FROM openai_threads WHERE user_id = (select id from users where phone_number = ${phoneNumber}) and active = true;`;
+        if (thread[0])
+            return thread[0].thread_id;
         else return undefined;
     } catch (error) {
         console.error('Open AI Thread call error:', error);
