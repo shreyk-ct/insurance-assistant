@@ -50,10 +50,9 @@ export const getOpenAIThread = async (phoneNumber: string): Promise<string | und
     const values = [phoneNumber];
     try {
         const { rows } = await connectionPool.query(openAIThreadQuery, values);
-        if (rows[0]) {
+        if (rows[0])
             return rows[0].thread_id;
-        }
-        else undefined;
+        else return undefined;
     } catch (error) {
         console.error('Open AI Thread call error:', error);
         return Promise.reject(error);

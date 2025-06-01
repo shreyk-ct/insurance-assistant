@@ -1,12 +1,13 @@
 import { getUserInfo } from "../db/users";
 // import { uploadPolicyDocument } from "../db/policy";
 // import { setClaimInformation } from "../db/submitClaim";
-import { createOpenAIThread, getOpenAIThread } from "../db/threads";
+import { closeOpenAIThread, createOpenAIThread, getOpenAIThread } from "../db/threads";
 import { createThread, createThreadMessage, pollThreadResponse, runThread } from "../openai";
 import { replyCustomMessage, replyCustomMessageWithList, replyCustomMessageWithReplyButton } from "./replyMessage";
 import { sendCustomMessage } from "./sendCustomMessage";
 import { OpenAIThreadMessageResponse } from "../openai/types";
 import { setClaimInformation } from "../db/insuranceClaim";
+import { uploadPolicyDocument } from "../db/policy";
 
 export const templateMessage = async (
     messageText: string,
@@ -15,10 +16,14 @@ export const templateMessage = async (
     messageId: string,
     withReplyButton: boolean
 ) => {
-    // if (messageText.toLowerCase() === 'upload') {
-    //     await uploadPolicyDocument();
-    //     return;
-    // }
+    if (messageText.toLowerCase() === 'upload') {
+        await uploadPolicyDocument();
+        return;
+    }
+    if (messageText.toLowerCase() === 'forget') {
+        await closeOpenAIThread(senderPhoneNumber);
+        return;
+    }
     const activeThread: string | undefined = await getOpenAIThread(senderPhoneNumber);
     let sendReplyButton = true;
     if (!activeThread) {

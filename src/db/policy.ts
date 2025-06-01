@@ -1,4 +1,6 @@
 import connectionPool from ".";
+import { config } from "dotenv";
+config();
 
 export const getClaimPolicyInfo = async (phoneNumber: string) => {
     const conversationQuery = `
@@ -49,7 +51,7 @@ export const uploadPolicyDocument = async () => {
     `;
     const fs = require('fs');
 
-    fs.readFile('/home/shreyk/Documents/Sample Motor Policy.pdf', async (err: any, data: any) => {
+    fs.readFile(process.env.POLICY_DOCUMENT_PATH, async (err: any, data: any) => {
         if (err) {
             console.error('Error reading the file:', err);
             return;
