@@ -3,15 +3,15 @@ import { config } from "dotenv";
 config();
 
 export const getClaimPolicyInfo = async (phoneNumber: string) => {
-    const conversationQuery = `
-        SELECT * FROM conversation where user_id = (select id from users where phone_number = $1) and active = true;
+    const openAIThreadQuery = `
+        SELECT * FROM openai_threads where user_id = (select id from users where phone_number = $1) and active = true;
     `;
     const policyQuery = `
         SELECT * FROM policies WHERE id = $1;
     `;
 
     try {
-        const { rows } = await connectionPool.query(conversationQuery, [phoneNumber]);
+        const { rows } = await connectionPool.query(openAIThreadQuery, [phoneNumber]);
         const { rows: policyRows } = await connectionPool.query(policyQuery, [rows[0].policy_id]);
         const policy = policyRows[0];
         return {

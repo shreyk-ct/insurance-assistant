@@ -3,17 +3,17 @@ import { ClaimData } from "./types";
 
 export const setClaimInformation = async (phoneNumber: string, data: ClaimData): Promise<void> => {
 
-    const conversationQuery = `
-        SELECT * FROM conversation where user_id = (select id from users where phone_number = $1) and active = true;
+    const openAIThreadQuery = `
+        SELECT * FROM openai_threads where user_id = (select id from users where phone_number = $1) and active = true;
     `;
 
     const claimQuery = `
-        INSERT INTO insurance_claim (accident_date, accident_time, vehicle_location, description, injury_damage, location, conversation_id, status) 
+        INSERT INTO insurance_claim (accident_date, accident_time, vehicle_location, description, injury_damage, location, openai_thread_id, status) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
     `;
     const values = [phoneNumber];
     try {
-        const { rows } = await connectionPool.query(conversationQuery, values);
+        const { rows } = await connectionPool.query(openAIThreadQuery, values);
         if (!rows[0]) {
             return undefined;
         }
@@ -29,22 +29,22 @@ export const setClaimInformation = async (phoneNumber: string, data: ClaimData):
         ]);
         return;
     } catch (error) {
-        console.error('Error getting conversation:', error);
+        console.error('Error getting openAIThread:', error);
         return Promise.reject(error);
     }
 };
 
 export const getClaimInformation = async (phoneNumber: string) => {
-    const conversationQuery = `
-        SELECT * FROM conversation where user_id = (select id from users where phone_number = $1) and active = true;
+    const openAIThreadQuery = `
+        SELECT * FROM openai_threads where user_id = (select id from users where phone_number = $1) and active = true;
     `;
 
     const claimQuery = `
-        SELECT * FROM insurance_claim WHERE conversation_id = $1
+        SELECT * FROM insurance_claim WHERE openai_thread_id = $1
     `;
 
     try {
-        const { rows } = await connectionPool.query(conversationQuery, [phoneNumber]);
+        const { rows } = await connectionPool.query(openAIThreadQuery, [phoneNumber]);
         const { rows: claimRows } = await connectionPool.query(claimQuery, [rows[0].id]);
         return {
             id: claimRows[0].id,
