@@ -7,7 +7,6 @@ import { replyCustomMessage, replyCustomMessageWithList, replyCustomMessageWithR
 import { sendCustomMessage } from "./sendCustomMessage";
 import { OpenAIThreadMessageResponse } from "../openai/types";
 import { setClaimInformation } from "../db/insuranceClaim";
-import { uploadPolicyDocument } from "../db/policy";
 
 export const templateMessage = async (
     messageText: string,
@@ -16,10 +15,6 @@ export const templateMessage = async (
     messageId: string,
     withReplyButton: boolean
 ) => {
-    if (messageText.toLowerCase() === 'upload') {
-        await uploadPolicyDocument();
-        return;
-    }
     if (messageText.toLowerCase() === 'forget') {
         await closeOpenAIThread(senderPhoneNumber);
         return;

@@ -1,4 +1,3 @@
-import axios from "axios";
 import connectionPool from ".";
 import { config } from "dotenv";
 config();
@@ -48,25 +47,23 @@ export const getPolicyDocument = async (policyId: string) => {
 
 export const uploadPolicyDocument = async () => {
     const policyQuery = `
-        UPDATE policies SET policy_document = $1
+        update policies set policy_document = $1
     `;
+    const fs = require('fs');
 
-    const policyUrl = process.env.POLICY_DOCUMENT_URL;
-    if (!policyUrl) {
-        console.error('POLICY_DOCUMENT_URL environment variable not set.');
-        return;
-    }
-
-    try {
-        const response = await axios.get(policyUrl, { responseType: 'arraybuffer' });
-        const documentBuffer = Buffer.from(response.data);
-
-        const values = [documentBuffer];
-        await connectionPool.query(policyQuery, values);
-
-        console.log('Policy document uploaded successfully.');
-    } catch (error) {
-        console.error('Error downloading or uploading policy document:', error);
-        return Promise.reject(error);
-    }
-};
+    fs.readFile(process.env.POLICY_DOCUMENT_PATH, async (err: any, data: any) => {
+        if (err) {
+            console.error('Error reading the file:', err);
+            return;
+        }
+        console.log('File content (callback):');
+        const values = [data];
+        try {
+            await connectionPool.query(policyQuery, values);
+            return;
+        } catch (error) {
+            console.error('Error getting user info:', error);
+            return Promise.reject(error);
+        }
+    });
+}
