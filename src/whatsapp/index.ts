@@ -33,20 +33,25 @@ export const handleWhatsappMessages = async (
             const runAssistant = await runThread(threadId);
             const threadResponse: OpenAIThreadMessageResponse = await pollThreadResponse(threadId, runAssistant.id);
             llmResponse = threadResponse.text.value;
-            let jsonStart = llmResponse!.indexOf("```");
-            if (jsonStart !== -1) {
-                jsonStart = llmResponse!.indexOf("```json");
-                const jsonEnd = llmResponse!.lastIndexOf("```");
-                let jsonRespStr = llmResponse!.substring(jsonStart + 7, jsonEnd);
-                let jsonResp = JSON.parse(jsonRespStr);
-                const damageDetected = jsonResp.damageDetected;
-                if (damageDetected) {
-                    const damageSummary = summarizeDamages(jsonResp);
-                    await templateMessage(damageSummary, senderPhoneNumber, true, messageId, true);
-                    await addImage(senderPhoneNumber, base64Image, damageSummary);
-                } else {
-                    await templateMessage("The image provided is not of a car, please provide a car image with damages.", senderPhoneNumber, true, messageId, false);
+            console.log("img llmResponse", llmResponse);
+            try {
+                let jsonStart = llmResponse!.indexOf("```");
+                if (jsonStart !== -1) {
+                    jsonStart = llmResponse!.indexOf("```json");
+                    const jsonEnd = llmResponse!.lastIndexOf("```");
+                    let jsonRespStr = llmResponse!.substring(jsonStart + 7, jsonEnd);
+                    let jsonResp = JSON.parse(jsonRespStr);
+                    const damageDetected = jsonResp.damageDetected;
+                    if (damageDetected) {
+                        const damageSummary = summarizeDamages(jsonResp);
+                        await templateMessage(damageSummary, senderPhoneNumber, true, messageId, true);
+                        await addImage(senderPhoneNumber, base64Image, damageSummary);
+                    } else {
+                        await templateMessage("The image provided is not of a car, please provide a car image with damages.", senderPhoneNumber, true, messageId, false);
+                    }
                 }
+            } catch (error) {
+                console.log("image json error", error);
             }
         }
     } else if (messageType === 'interactive') {

@@ -58,3 +58,16 @@ export const getOpenAIThread = async (phoneNumber: string): Promise<string | und
         return Promise.reject(error);
     }
 };
+
+export const getTotalOpenAIThreads = async () => {
+    const openAIThreadQuery = `
+        SELECT COUNT(*) FROM openai_threads where active = true;
+    `;
+    try {
+        const { rows } = await connectionPool.query(openAIThreadQuery);
+        return rows[0].count;
+    } catch (error) {
+        console.error('Open AI Thread call error:', error);
+        return Promise.reject(error);
+    }
+};
