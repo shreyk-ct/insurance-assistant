@@ -71,3 +71,16 @@ export const getTotalOpenAIThreads = async () => {
         return Promise.reject(error);
     }
 };
+
+export const closeAllOpenAIThreads = async () => {
+    const openAIThreadQuery = `
+        UPDATE openai_threads SET active = false;
+    `;
+    try {
+        const { rows } = await connectionPool.query(openAIThreadQuery);
+        return rows[0].count;
+    } catch (error) {
+        console.error('Open AI Thread call error:', error);
+        return Promise.reject(error);
+    }
+};

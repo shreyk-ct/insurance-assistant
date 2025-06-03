@@ -13,10 +13,15 @@ export const createThread = async () => {
 };
 
 export const createThreadMessage = async (threadId: string, message: string) => {
-    return openai.beta.threads.messages.create(threadId, {
-        role: 'user',
-        content: message,
-    });
+    try {
+        return await openai.beta.threads.messages.create(threadId, {
+            role: 'user',
+            content: message,
+        });
+    } catch (err) {
+        console.log(err);
+        return Promise<void>;
+    }
 };
 
 export const uploadFile = async (file: File) => {
@@ -24,42 +29,54 @@ export const uploadFile = async (file: File) => {
         file,
         purpose: 'assistants',
     });
+
 };
 
 export const createThreadMessageWithFile = async (threadId: string, message: string, file: File) => {
-    const fileId = await uploadFile(file);
-    return openai.beta.threads.messages.create(threadId, {
-        role: 'user',
-        content: message,
-        attachments: [
-            {
-                file_id: fileId.id,
-                tools: [{ type: 'file_search' }],
-            }
-        ],
-    });
+    try {
+        const fileId = await uploadFile(file);
+        return await openai.beta.threads.messages.create(threadId, {
+            role: 'user',
+            content: message,
+            attachments: [
+                {
+                    file_id: fileId?.id,
+                    tools: [{ type: 'file_search' }],
+                }
+            ],
+        });
+    } catch (err) {
+        console.log(err);
+        return Promise<void>;
+    }
 };
 
 export const createThreadMessageWithImage = async (threadId: string, message: string, file: File) => {
-    const fileId = await uploadFile(file);
-    return openai.beta.threads.messages.create(threadId, {
-        role: 'user',
-        content: [
-            {
-                type: 'text',
-                text: message
-            },
-            {
-                type: 'image_file',
-                image_file: {
-                    file_id: fileId.id
+    try {
+        const fileId = await uploadFile(file);
+        return await openai.beta.threads.messages.create(threadId, {
+            role: 'user',
+            content: [
+                {
+                    type: 'text',
+                    text: message
+                },
+                {
+                    type: 'image_file',
+                    image_file: {
+                        file_id: fileId?.id
+                    }
                 }
-            }
-        ],
-    });
+            ],
+        });
+    } catch (err) {
+        console.log(err);
+        return Promise<void>;
+    }
 };
 
 export const runThread = async (threadId: string) => {
+
     return openai.beta.threads.runs.create(
         threadId,
         { assistant_id: assistantId! }
@@ -71,11 +88,16 @@ export const getThreadMessage = async (threadId: string) => {
 };
 
 export const pollThreadResponse = async (threadId: string, runId: string): Promise<OpenAIThreadMessageResponse> => {
-    let runStatus;
-    do {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
-    } while (runStatus.status !== 'completed');
-    const messages = await getThreadMessage(threadId);
-    return messages.data[0].content[0] as unknown as OpenAIThreadMessageResponse;
+    try {
+        let runStatus;
+        do {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
+        } while (runStatus.status !== 'completed');
+        const messages = await getThreadMessage(threadId);
+        return messages.data[0].content[0] as unknown as OpenAIThreadMessageResponse;
+    } catch (err) {
+        console.log(err);
+        return "We are having some issues with the server. Please try again later." as unknown as OpenAIThreadMessageResponse;
+    }
 };

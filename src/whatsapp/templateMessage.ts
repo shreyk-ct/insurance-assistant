@@ -50,12 +50,16 @@ export const templateMessage = async (
             return replyCustomMessage(`Your name is ${userInfo.name} and your policy number is ${userInfo.policy}. How can I assist you today?`, messageId, senderPhoneNumber);
         }
     } else {
-        let llmResponse: string | null;
+        let llmResponse: string | null = "";
 
         await createThreadMessage(activeThread!, messageText);
-        const runAssistant = await runThread(activeThread!);
-        const threadResponse: OpenAIThreadMessageResponse = await pollThreadResponse(activeThread!, runAssistant.id);
-        llmResponse = threadResponse.text.value;
+        try {
+            const runAssistant = await runThread(activeThread!);
+            const threadResponse: OpenAIThreadMessageResponse = await pollThreadResponse(activeThread!, runAssistant.id);
+            llmResponse = threadResponse.text.value;
+        } catch (error) {
+            console.log("message run thread error", error);
+        }
         console.log("message llm response", llmResponse);
         try {
             let jsonStart = llmResponse!.indexOf("```");

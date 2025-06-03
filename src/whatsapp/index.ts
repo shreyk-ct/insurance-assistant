@@ -30,9 +30,13 @@ export const handleWhatsappMessages = async (
                 threadId = (await createThread()).id;
             }
             await createThreadMessageWithImage(threadId, "analyze", imageData);
-            const runAssistant = await runThread(threadId);
-            const threadResponse: OpenAIThreadMessageResponse = await pollThreadResponse(threadId, runAssistant.id);
-            llmResponse = threadResponse.text.value;
+            try {
+                const runAssistant = await runThread(threadId);
+                const threadResponse: OpenAIThreadMessageResponse = await pollThreadResponse(threadId, runAssistant?.id);
+                llmResponse = threadResponse.text.value;
+            } catch (error) {
+                console.log("image run thread error", error);
+            }
             console.log("img llmResponse", llmResponse);
             try {
                 let jsonStart = llmResponse!.indexOf("```");

@@ -1,1 +1,3 @@
 GET http://localhost:5000/api/v1/test
+
+GET http://localhost:5000/api/v1/closeall

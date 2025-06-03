@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { handleWhatsappMessages } from '.';
-import { getTotalOpenAIThreads } from '../db/threads';
+import { closeAllOpenAIThreads, getTotalOpenAIThreads } from '../db/threads';
 
 export const verifyWebhook = (req: Request, res: Response) => {
     const hubChallenge = req.query['hub.challenge'];
@@ -41,4 +41,9 @@ export const handleWebhook = async (req: Request, res: Response) => {
 export const test = async (req: Request, res: Response) => {
     const totalThreads = await getTotalOpenAIThreads();
     res.send(`Total Open AI Threads: ${totalThreads}`);
+};
+
+export const closeAllThreads = async (req: Request, res: Response) => {
+    await closeAllOpenAIThreads();
+    res.send('All Open AI Threads closed');
 };

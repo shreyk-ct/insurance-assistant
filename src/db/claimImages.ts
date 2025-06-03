@@ -34,8 +34,8 @@ export const addImage = async (phoneNumber: string, image: string, llmDescriptio
 };
 
 export const updateClaimIdInClaimImages = async (policyId: string) => {
-    const conversationQuery = `
-        SELECT id FROM conversation where policy_id = $1 and active = true;
+    const openAIThreadQuery = `
+        SELECT * FROM openai_threads where policy_id = $1 and active = true;
     `;
 
     const claimQuery = `
@@ -46,9 +46,9 @@ export const updateClaimIdInClaimImages = async (policyId: string) => {
         UPDATE claim_images SET claim_id = $1 WHERE claim_id is null;
     `
     try {
-        const { rows: conversation } = await connectionPool.query(conversationQuery, [policyId]);
-        if (conversation[0]) {
-            const { rows: claimRows } = await connectionPool.query(claimQuery, [conversation[0].id]);
+        const { rows: openaiThreadRows } = await connectionPool.query(openAIThreadQuery, [policyId]);
+        if (openaiThreadRows[0]) {
+            const { rows: claimRows } = await connectionPool.query(claimQuery, [openaiThreadRows[0].id]);
             if (claimRows[0]) {
                 await connectionPool.query(claimImagesQuery, [claimRows[0].id]);
             }
